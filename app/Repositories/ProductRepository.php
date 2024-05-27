@@ -14,7 +14,7 @@ class ProductRepository
             if ($categoryId) {
                 Log::info("Filtering products by category ID: $categoryId");
                 return Product::whereHas('categories', function ($q) use ($categoryId) {
-                    $q->where('categories.id', $categoryId); // Specify the table name for the id column
+                    $q->where('categories.id', $categoryId);
                 })->with('categories')->get();
             } else {
                 Log::info("Fetching all products");
