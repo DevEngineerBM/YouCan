@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 class ProductController extends Controller
 {
 
-    // injection of ProductREpository dependencies 
+    // injection of ProductREpository dependencies class
     protected $productRepository;
 
     public function __construct(ProductRepository $productRepository)
