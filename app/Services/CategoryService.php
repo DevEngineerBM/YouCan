@@ -2,56 +2,51 @@
 
 namespace App\Services;
 
-
-
 use App\Models\Category;
 use App\Validators\CategoryValidator;
 use App\Repositories\CategoryRepository;
 use Illuminate\Database\Eloquent\Collection;
 
 class CategoryService
-
 {
-    protected $CategoryRepository;
-    protected $CategoryValidator;
+    protected $categoryRepository;
+    protected $categoryValidator;
 
-    public function __construct(CategoryRepository $categoryRepository, CategoryValidator $CategoryValidator)
-    {
+    public function __construct(
+        CategoryRepository $categoryRepository,
+        CategoryValidator $categoryValidator
+    ) {
 
-        $this->CategoryRepository = $categoryRepository;
-        $this->CategoryValidator = $CategoryValidator;
+        $this->categoryRepository = $categoryRepository;
+        $this->categoryValidator = $categoryValidator;
     }
 
     public function all(): Collection
     {
-
-        return $this->CategoryRepository->all();
+        return $this->categoryRepository->all();
     }
 
     public function find(int $id): Category
     {
-
-        return $this->CategoryRepository->find($id);
+        return $this->categoryRepository->find($id);
     }
 
     public function create(array $data): Category
     {
-        $ValidatedData = $this->CategoryValidator->validateCategoryData($data);
+        $ValidatedData = $this->categoryValidator->validateCategoryData($data);
 
-
-        return $this->CategoryRepository->create($ValidatedData);
+        return $this->categoryRepository->create($ValidatedData);
     }
 
     public function update(Category $category, array $data): Category
     {
-        $ValidatedData = $this->CategoryValidator->validateCategoryData($data);
+        $ValidatedData = $this->categoryValidator->validateCategoryData($data);
 
-        return $this->CategoryRepository->update($category, $ValidatedData);
+        return $this->categoryRepository->update($category, $ValidatedData);
     }
 
     public function delete(Category $category): void
     {
-
-        $this->CategoryRepository->delete($category);
+        $this->categoryRepository->delete($category);
     }
 }

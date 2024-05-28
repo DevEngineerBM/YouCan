@@ -6,6 +6,7 @@ use App\Services\ProductService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ProductController extends Controller
 {
@@ -54,15 +55,20 @@ class ProductController extends Controller
             return response()->json($product, 201);
         } catch (\throwable $e) {
             Log::error('Error occurred while storing product:', ['error' => $e->getMessage()]);
-            throw $e;
+
+            return response()->json(['message' => 'Internal Server Error'], 500);
         }
     }
 
     public function show($id)
     {
-        $product = $this->productService->find($id);
+        try {
+            $product = $this->productService->find($id);
 
-        return response()->json($product);
+            return response()->json($product);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => 'Not Found'], 500);
+        }
     }
 
     public function update(Request $request, $id)
@@ -81,7 +87,6 @@ class ProductController extends Controller
         $product = $this->productService->update($product, $request->all());
 
         if ($request->has('category_ids')) {
-
             $product->categories()->sync($request->input('category_ids'));
         }
 

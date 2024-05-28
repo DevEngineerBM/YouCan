@@ -19,6 +19,7 @@ class VerifyCsrfToken extends Middleware
      * @var array
      */
     protected $except = [
-        //
+        // any route that starts with api/ will not require CSRF tokens for requests
+        'api/*',
     ];
 }
