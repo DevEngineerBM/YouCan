@@ -3,35 +3,40 @@
 namespace App\Repositories;
 
 use App\Models\Category;
-use App\Services\CategoryValidator;
+use Illuminate\Database\Eloquent\Collection;
 
 class CategoryRepository
 {
-    public function all()
+
+
+    public function all(): Collection
     {
+
         return Category::with('parent', 'children')->get();
     }
 
-    public function find($id)
+    public function find(int $id): Category
     {
+
         return Category::with('parent', 'children')->findOrFail($id);
     }
 
-    public function create(array $data)
+    public function create(array $data): Category
     {
-        $validatedData = CategoryValidator::validateCategoryData($data);
-        return Category::create($validatedData);
+
+        return Category::create($data);
     }
 
-    public function update(Category $category, array $data)
+    public function update(Category $category, array $data): Category
     {
-        $validatedData = CategoryValidator::validateCategoryData($data);
-        $category->update($validatedData);
+
+        $category->update($data);
         return $category;
     }
 
     public function delete(Category $category)
     {
+
         $category->delete();
     }
 }

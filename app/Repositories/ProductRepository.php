@@ -3,48 +3,57 @@
 namespace App\Repositories;
 
 use App\Models\Product;
-use App\Services\ProductValidator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
 
 class ProductRepository
 {
-    public function all($categoryId = null)
+    public function all($categoryId = null): Collection
     {
         try {
+
             if ($categoryId) {
+
                 Log::info("Filtering products by category ID: $categoryId");
+
                 return Product::whereHas('categories', function ($q) use ($categoryId) {
+
                     $q->where('categories.id', $categoryId);
                 })->with('categories')->get();
-            } else {
-                Log::info("Fetching all products");
-                return Product::with('categories')->get();
             }
-        } catch (\Exception $e) {
+
+            Log::info("Fetching all products");
+
+            return Product::with('categories')->get();
+        } catch (\Throwable $e) {
+
             Log::error("Error fetching products: " . $e->getMessage());
+
             throw $e;
         }
     }
 
-    public function find($id)
+    public function find(int $id): Product
     {
+
         return Product::with('categories')->findOrFail($id);
     }
 
-    public function create(array $data)
+    public function create(array $data): Product
     {
-        $validatedData = ProductValidator::validateProductData($data);
-        return Product::create($validatedData);
+
+        return Product::create($data);
     }
 
-    public function update(Product $product, array $data)
+    public function update(Product $product, array $data): Product
     {
-        $validatedData = ProductValidator::validateProductData($data);
-        $product->update($validatedData);
-        return $product;
+
+        $product->update($data);
+
+        return  $product;
     }
 
-    public function delete(Product $product)
+    public function delete(Product $product): void
     {
         $product->delete();
     }
