@@ -2,23 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\ProductRepository;
+use App\Services\ProductService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
+    protected $productService;
 
-    // injection of ProductREpository dependencies class
-    protected $productRepository;
-
-    public function __construct(ProductRepository $productRepository)
+    public function __construct(ProductService $productService)
     {
-        $this->productRepository = $productRepository;
+        $this->productService = $productService;
     }
-
-    /* ============================================== */
 
     public function index(Request $request)
     {
@@ -26,25 +22,25 @@ class ProductController extends Controller
         Log::info("Index method called with category ID: " . $categoryId);
 
         try {
-            $products = $this->productRepository->all($categoryId);
+            $products = $this->productService->all($categoryId);
+
             return response()->json($products);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error("Error in ProductController index method: " . $e->getMessage());
+
             return response()->json(['message' => 'Internal Server Error'], 500);
         }
     }
-
-    /* ============================================== */
 
     public function store(Request $request)
     {
         Log::info('Store method called with data:', $request->all());
 
         try {
-            $product = $this->productRepository->create($request->all());
+            $product = $this->productService->create($request->all());
 
             if ($request->hasFile('image')) {
-                Log::info('Image file found in the request.');
+                // fix public thing later
                 $filePath = $request->file('image')->store('public/images');
                 $product->update(['image' => $filePath]);
             } else {
@@ -56,52 +52,50 @@ class ProductController extends Controller
             }
 
             return response()->json($product, 201);
-        } catch (\Exception $e) {
+        } catch (\throwable $e) {
             Log::error('Error occurred while storing product:', ['error' => $e->getMessage()]);
             throw $e;
         }
     }
 
-    /* ============================================== */
-
     public function show($id)
     {
-        $product = $this->productRepository->find($id);
+        $product = $this->productService->find($id);
+
         return response()->json($product);
     }
 
-    /* ============================================== */
-
     public function update(Request $request, $id)
     {
-        $product = $this->productRepository->find($id);
+        $product = $this->productService->find($id);
 
         if ($request->hasFile('image')) {
             if ($product->image) {
+                // to fix later (security issue)
                 Storage::disk('public')->delete($product->image);
             }
             $filePath = $request->file('image')->store('public/images');
             $product->update(['image' => $filePath]);
         }
 
-        $product = $this->productRepository->update($product, $request->all());
+        $product = $this->productService->update($product, $request->all());
 
         if ($request->has('category_ids')) {
+
             $product->categories()->sync($request->input('category_ids'));
         }
 
         return response()->json($product);
     }
 
-    /* ============================================== */
-
     public function destroy($id)
     {
-        $product = $this->productRepository->find($id);
+        $product = $this->productService->find($id);
         if ($product->image) {
             Storage::disk('public')->delete($product->image);
         }
-        $this->productRepository->delete($product);
+        $this->productService->delete($product);
+
         return response()->json(null, 204);
     }
 }

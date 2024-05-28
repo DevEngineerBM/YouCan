@@ -2,25 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\CategoryRepository;
+use App\Services\CategoryService;
 use Illuminate\Http\Request;
+
 
 class CategoryController extends Controller
 {
 
     // injection of categoryRepository dependencies
-    protected $categoryRepository;
+    protected $categoryService;
 
-    public function __construct(CategoryRepository $categoryRepository)
+    public function __construct(CategoryService $categoryService)
     {
-        $this->categoryRepository = $categoryRepository;
+        $this->categoryService = $categoryService;
     }
 
     /* ============================================== */
 
-    public function index(Request $request)
+    public function index()
     {
-        $categories = $this->categoryRepository->all();
+        $categories = $this->categoryService->all();
         return response()->json($categories);
     }
 
@@ -28,7 +29,7 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
-        $category = $this->categoryRepository->create($request->all());
+        $category = $this->categoryService->create($request->all());
         return response()->json($category, 201);
     }
 
@@ -36,7 +37,7 @@ class CategoryController extends Controller
 
     public function show($id)
     {
-        $category = $this->categoryRepository->find($id);
+        $category = $this->categoryService->find($id);
         return response()->json($category);
     }
 
@@ -44,8 +45,8 @@ class CategoryController extends Controller
 
     public function update(Request $request, $id)
     {
-        $category = $this->categoryRepository->find($id);
-        $category = $this->categoryRepository->update($category, $request->all());
+        $category = $this->categoryService->find($id);
+        $category = $this->categoryService->update($category, $request->all());
         return response()->json($category);
     }
 
@@ -53,8 +54,8 @@ class CategoryController extends Controller
 
     public function destroy($id)
     {
-        $category = $this->categoryRepository->find($id);
-        $this->categoryRepository->delete($category);
+        $category = $this->categoryService->find($id);
+        $this->categoryService->delete($category);
         return response()->json(null, 204);
     }
 }
