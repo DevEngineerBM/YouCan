@@ -80,8 +80,7 @@ class ProductController extends Controller
                 // to fix later (security issue)
                 Storage::disk('public')->delete($product->image);
             }
-            $filePath = $request->file('image')->store('public/images');
-            $product->update(['image' => $filePath]);
+            $request->file('image')->store('public/images');
         }
 
         $product = $this->productService->update($product, $request->all());
