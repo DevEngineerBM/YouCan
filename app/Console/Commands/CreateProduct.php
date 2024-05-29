@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Repositories\ProductRepository;
+use App\Services\ProductService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
@@ -12,12 +12,12 @@ class CreateProduct extends Command
     protected $signature = 'product:create {name} {description} {price} {--image=} {--category_ids=*}';
     protected $description = 'Create a new product';
 
-    protected $productRepository;
+    protected $productService;
 
-    public function __construct(ProductRepository $productRepository)
+    public function __construct(ProductService $productService)
     {
         parent::__construct();
-        $this->productRepository = $productRepository;
+        $this->productService = $productService;
     }
 
     public function handle()
@@ -37,7 +37,7 @@ class CreateProduct extends Command
         ];
 
         try {
-            $product = $this->productRepository->create($data);
+            $product = $this->productService->create($data);
 
             if ($image) {
 
